@@ -75,6 +75,9 @@ function Main(props) {
             key={card._id}
             updateLikes={updateLikes}
             deleteCard={deleteCard}
+            setCardImage={props.setCardImage}
+            setCardCaption={props.setCardCaption}
+            setImagePopupState={props.setImagePopupState}
           ></Card>
         ))}
       </section>

@@ -19,9 +19,20 @@ function Card(props) {
     props.deleteCard(card._id);
   }
 
+  function openPopup() {
+    props.setCardImage(card.link);
+    props.setCardCaption(card.name);
+    props.setImagePopupState(true);
+  }
+
   return (
     <article className="card">
-      <img className="card__image" src={card.link} alt={card.name} />
+      <img
+        className="card__image"
+        src={card.link}
+        alt={card.name}
+        onClick={openPopup}
+      />
       {card.owner._id === props.userId && (
         <button
           type="button"

@@ -14,6 +14,8 @@ function App() {
   const [userDescription, setUserDescription] = React.useState();
   const [userId, setUserId] = React.useState();
   const [cards, setCards] = React.useState([]);
+  const [cardImage, setCardImage] = React.useState();
+  const [cardCaption, setCardCaption] = React.useState();
 
   function getUserInfo() {
     api
@@ -66,6 +68,7 @@ function App() {
     setEditProfilePopupState(false);
     setAddPlacePopupState(false);
     setEditAvatarPopupState(false);
+    setImagePopupState(false);
   }
 
   const validationConfig = {
@@ -163,6 +166,9 @@ function App() {
         userDescription={userDescription}
         cards={cards}
         setCards={setCards}
+        setCardImage={setCardImage}
+        setCardCaption={setCardCaption}
+        setImagePopupState={setImagePopupState}
         userId={userId}
       />
       <Footer footerCR="&copy; 2021 Around The U.S" />
@@ -239,7 +245,12 @@ function App() {
         />
         <p className="popup__input-error"></p>
       </PopupWithForm>
-      <ImagePopup />
+      <ImagePopup
+        onClose={closeAllPopups}
+        isOpen={isImagePopupOpen}
+        image={cardImage}
+        caption={cardCaption}
+      />
     </>
   );
 }
