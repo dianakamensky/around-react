@@ -15,11 +15,19 @@ function Card(props) {
     });
   }
 
+  function deleteCard() {
+    props.deleteCard(card._id);
+  }
+
   return (
     <article className="card">
       <img className="card__image" src={card.link} alt={card.name} />
       {card.owner._id === props.userId && (
-        <button type="button" className="card__delete-btn"></button>
+        <button
+          type="button"
+          className="card__delete-btn"
+          onClick={deleteCard}
+        ></button>
       )}
       <div className="card__caption-container">
         <h2 className="card__caption">{card.name}</h2>

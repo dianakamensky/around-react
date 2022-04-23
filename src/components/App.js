@@ -24,14 +24,14 @@ function App() {
         setUserAvatar(user.avatar);
         setUserId(user._id);
       })
-      .catch((err) => console.log(`Error fetching user info: ${err}`));
+      .catch((err) => window.alert(`Error fetching user info: ${err}`));
   }
 
   function getCards() {
     api
       .getInitialCards()
       .then(setCards)
-      .catch((err) => console.log(`Error loading initial cards: ${err}`));
+      .catch((err) => window.alert(`Error loading initial cards: ${err}`));
   }
 
   React.useEffect(getUserInfo, []);
@@ -76,29 +76,38 @@ function App() {
     errorClass: "popup__input-error_visible",
   };
 
-  React.useEffect(function () {
-    const formValidator = new FormValidator(
-      validationConfig,
-      document.querySelector('form[name="editProfile"]')
-    );
-    formValidator.enableValidation();
-  }, []);
+  React.useEffect(
+    function () {
+      const formValidator = new FormValidator(
+        validationConfig,
+        document.querySelector('form[name="editProfile"]')
+      );
+      formValidator.enableValidation();
+    },
+    [validationConfig]
+  );
 
-  React.useEffect(function () {
-    const formValidator = new FormValidator(
-      validationConfig,
-      document.querySelector('form[name="addLocation"]')
-    );
-    formValidator.enableValidation();
-  }, []);
+  React.useEffect(
+    function () {
+      const formValidator = new FormValidator(
+        validationConfig,
+        document.querySelector('form[name="addLocation"]')
+      );
+      formValidator.enableValidation();
+    },
+    [validationConfig]
+  );
 
-  React.useEffect(function () {
-    const formValidator = new FormValidator(
-      validationConfig,
-      document.querySelector('form[name="changeAvatar"]')
-    );
-    formValidator.enableValidation();
-  }, []);
+  React.useEffect(
+    function () {
+      const formValidator = new FormValidator(
+        validationConfig,
+        document.querySelector('form[name="changeAvatar"]')
+      );
+      formValidator.enableValidation();
+    },
+    [validationConfig]
+  );
 
   const [profileSubmit, setProfileSubmit] = React.useState("Save");
   const [cardSubmit, setCardSubmit] = React.useState("Create");
@@ -113,7 +122,7 @@ function App() {
         setUserDescription(user.about);
         closeAllPopups();
       })
-      .catch((err) => console.log(`Error saving profile: ${err}`))
+      .catch((err) => window.alert(`Error saving profile: ${err}`))
       .finally(() => setProfileSubmit("Save"));
   }
 
@@ -125,8 +134,20 @@ function App() {
         setCards([data, ...cards]);
         closeAllPopups();
       })
-      .catch((err) => console.log(`Error creating card: ${err}`))
+      .catch((err) => window.alert(`Error creating card: ${err}`))
       .finally(() => setCardSubmit("Create"));
+  }
+
+  function saveAvatar(data) {
+    setCardSubmit("Saving...");
+    api
+      .saveAvatar(data)
+      .then((user) => {
+        setUserAvatar(user.avatar);
+        closeAllPopups();
+      })
+      .catch((err) => window.alert(`Error saving avatar: ${err}`))
+      .finally(() => setAvatarSubmit("Save"));
   }
 
   return (
@@ -141,6 +162,7 @@ function App() {
         userName={userName}
         userDescription={userDescription}
         cards={cards}
+        setCards={setCards}
         userId={userId}
       />
       <Footer footerCR="&copy; 2021 Around The U.S" />
@@ -205,6 +227,8 @@ function App() {
         name="changeAvatar"
         isOpen={isEditAvatarPopupOpen}
         onClose={closeAllPopups}
+        onSubmit={saveAvatar}
+        submitText={avatarSubmit}
       >
         <input
           className="popup__input popup__input_info_link"

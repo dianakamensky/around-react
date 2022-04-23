@@ -14,6 +14,12 @@ function Main(props) {
       .catch((err) => console.log(`Error liking card: ${err}`));
   }
 
+  function deleteCard(cardId) {
+    api.deleteCard(cardId).then(() => {
+      props.setCards(props.cards.filter((c) => c._id !== cardId));
+    });
+  }
+
   return (
     <main className="main">
       <section className="profile">
@@ -68,6 +74,7 @@ function Main(props) {
             userId={props.userId}
             key={card._id}
             updateLikes={updateLikes}
+            deleteCard={deleteCard}
           ></Card>
         ))}
       </section>
