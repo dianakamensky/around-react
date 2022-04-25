@@ -5,51 +5,31 @@ import Footer from "./Footer";
 import Logo from "../images/Vector.svg";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
-import FormValidator from "./FormValidator";
+import FormValidator from "../utils/FormValidator";
 import api from "../utils/api";
 
 function App() {
-  const [userName, setUserName] = React.useState();
-  const [userAvatar, setUserAvatar] = React.useState();
-  const [userDescription, setUserDescription] = React.useState();
-  const [userId, setUserId] = React.useState();
-  const [cards, setCards] = React.useState([]);
-  const [cardImage, setCardImage] = React.useState();
-  const [cardCaption, setCardCaption] = React.useState();
-
-  function getUserInfo() {
-    api
-      .getUserInfo()
-      .then((user) => {
-        setUserName(user.name);
-        setUserDescription(user.about);
-        setUserAvatar(user.avatar);
-        setUserId(user._id);
-      })
-      .catch((err) => window.alert(`Error fetching user info: ${err}`));
-  }
-
-  function getCards() {
-    api
-      .getInitialCards()
-      .then(setCards)
-      .catch((err) => window.alert(`Error loading initial cards: ${err}`));
-  }
-
-  React.useEffect(getUserInfo, []);
-  React.useEffect(getCards, []);
-
+  const [selectedCard, setSelectedCard] = React.useState(null);
   const [isEditProfilePopupOpen, setEditProfilePopupState] =
     React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupState] = React.useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupState] =
     React.useState(false);
   const [isImagePopupOpen, setImagePopupState] = React.useState(false);
+  const [profileSubmit, setProfileSubmit] = React.useState("Save");
+  const [cardSubmit, setCardSubmit] = React.useState("Create");
+  const [avatarSubmit, setAvatarSubmit] = React.useState("Save");
+
+  const validationConfig = {
+    inputSelector: ".popup__input",
+    submitButtonSelector: ".popup__submit-btn",
+    activeButtonClass: "popup__submit-btn_active",
+    inputErrorClass: "popup__input_type_error",
+    errorClass: "popup__input-error_visible",
+  };
 
   function handleEditProfileClick() {
     setEditProfilePopupState(true);
-    document.querySelector(".popup__input_info_name").value = userName;
-    document.querySelector(".popup__input_info_job").value = userDescription;
   }
 
   function handleAddLocationClick() {
@@ -69,15 +49,8 @@ function App() {
     setAddPlacePopupState(false);
     setEditAvatarPopupState(false);
     setImagePopupState(false);
+    setSelectedCard(null);
   }
-
-  const validationConfig = {
-    inputSelector: ".popup__input",
-    submitButtonSelector: ".popup__submit-btn",
-    activeButtonClass: "popup__submit-btn_active",
-    inputErrorClass: "popup__input_type_error",
-    errorClass: "popup__input-error_visible",
-  };
 
   React.useEffect(
     function () {
@@ -111,23 +84,6 @@ function App() {
     },
     [validationConfig]
   );
-
-  const [profileSubmit, setProfileSubmit] = React.useState("Save");
-  const [cardSubmit, setCardSubmit] = React.useState("Create");
-  const [avatarSubmit, setAvatarSubmit] = React.useState("Save");
-
-  function saveProfile(data) {
-    setProfileSubmit("Saving...");
-    api
-      .saveProfile(data)
-      .then((user) => {
-        setUserName(user.name);
-        setUserDescription(user.about);
-        closeAllPopups();
-      })
-      .catch((err) => window.alert(`Error saving profile: ${err}`))
-      .finally(() => setProfileSubmit("Save"));
-  }
 
   function saveLocation(data) {
     setCardSubmit("Creating...");
@@ -166,10 +122,8 @@ function App() {
         userDescription={userDescription}
         cards={cards}
         setCards={setCards}
-        setCardImage={setCardImage}
-        setCardCaption={setCardCaption}
+        setSelectedCard={setSelectedCard}
         setImagePopupState={setImagePopupState}
-        userId={userId}
       />
       <Footer footerCR="&copy; 2021 Around The U.S" />
       <PopupWithForm
@@ -185,6 +139,7 @@ function App() {
           type="text"
           placeholder="Name"
           name="name"
+          value={userName}
           minLength="2"
           maxLength="40"
           required
@@ -195,6 +150,7 @@ function App() {
           type="text"
           placeholder="About me"
           name="about"
+          value={userDescription}
           minLength="2"
           maxLength="200"
           required
@@ -248,8 +204,8 @@ function App() {
       <ImagePopup
         onClose={closeAllPopups}
         isOpen={isImagePopupOpen}
-        image={cardImage}
-        caption={cardCaption}
+        image={selectedCard.link}
+        caption={selectedCard.name}
       />
     </>
   );

@@ -5,19 +5,64 @@ import Card from "./Card";
 import api from "../utils/api";
 
 function Main(props) {
-  function updateLikes(setLikes, cardId, isLiked) {
+  const [userName, setUserName] = React.useState("");
+  const [userAvatar, setUserAvatar] = React.useState("");
+  const [userDescription, setUserDescription] = React.useState("");
+  const [cards, setCards] = React.useState([]);
+  const [userId, setUserId] = React.useState("");
+
+  React.useEffect(getCards, []);
+  React.useEffect(getUserInfo, []);
+
+  function updateLikes(cardId, isLiked) {
     api
       .updateCardLike(cardId, isLiked)
       .then((data) => {
-        setLikes(data.likes);
+        cards.forEach(function (card) {
+          if (card._id === data._id) {
+            card.likes = data.likes;
+          }
+        });
       })
       .catch((err) => console.log(`Error liking card: ${err}`));
+  }
+
+  function getCards() {
+    api
+      .getInitialCards()
+      .then(setCards)
+      .catch((err) => window.alert(`Error loading initial cards: ${err}`));
   }
 
   function deleteCard(cardId) {
     api.deleteCard(cardId).then(() => {
       props.setCards(props.cards.filter((c) => c._id !== cardId));
     });
+  }
+
+  function getUserInfo() {
+    api
+      .getUserInfo()
+      .then((user) => {
+        setUserName(user.name);
+        setUserDescription(user.about);
+        setUserAvatar(user.avatar);
+        setUserId(user._id);
+      })
+      .catch((err) => window.alert(`Error fetching user info: ${err}`));
+  }
+
+  function saveProfile(data) {
+    setProfileSubmit("Saving...");
+    api
+      .saveProfile(data)
+      .then((user) => {
+        setUserName(user.name);
+        setUserDescription(user.about);
+        closeAllPopups();
+      })
+      .catch((err) => window.alert(`Error saving profile: ${err}`))
+      .finally(() => setProfileSubmit("Save"));
   }
 
   return (
@@ -71,12 +116,11 @@ function Main(props) {
         {props.cards.map((card) => (
           <Card
             card={card}
-            userId={props.userId}
+            userId={userId}
             key={card._id}
             updateLikes={updateLikes}
             deleteCard={deleteCard}
-            setCardImage={props.setCardImage}
-            setCardCaption={props.setCardCaption}
+            setSelectedCard={props.setSelectedCard}
             setImagePopupState={props.setImagePopupState}
           ></Card>
         ))}

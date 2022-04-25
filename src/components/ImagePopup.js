@@ -1,6 +1,6 @@
 function ImagePopup(props) {
   return (
-    <div className={`popup location-popup ${props.isOpen ? "popup_open" : ""}`}>
+    <div className={`popup location-popup ${props.isOpen && "popup_open"}}`}>
       <div className="location-popup__main">
         <button className="popup__close-btn" onClick={props.onClose}></button>
         <img className="location-popup__img" src={props.image} />

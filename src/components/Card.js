@@ -3,14 +3,12 @@ import React from "react";
 function Card(props) {
   const card = props.card;
 
-  const [likes, setLikes] = React.useState(card.likes);
-
   function updateLikes() {
-    props.updateLikes(setLikes, card._id, isLiked());
+    props.updateLikes(card._id, isLiked());
   }
 
   function isLiked() {
-    return likes.some((user) => {
+    return card.likes.some((user) => {
       return user._id === props.userId;
     });
   }
@@ -20,8 +18,7 @@ function Card(props) {
   }
 
   function openPopup() {
-    props.setCardImage(card.link);
-    props.setCardCaption(card.name);
+    props.setSelectedCard(card);
     props.setImagePopupState(true);
   }
 
@@ -50,7 +47,7 @@ function Card(props) {
             }`}
             onClick={updateLikes}
           ></button>
-          <div className="card__likes">{likes.length}</div>
+          <div className="card__likes">{card.likes.length}</div>
         </div>
       </div>
     </article>

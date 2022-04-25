@@ -1,4 +1,4 @@
-import Api from "../components/Api.js";
+import Api from "./Api";
 
 const groupID = "group-12";
 const token = "4b3d68f6-93f6-47fe-aa02-88e9440cdc46";
