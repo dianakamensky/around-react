@@ -1,4 +1,4 @@
-import Api from "./Api";
+import Api from "./ApiHandlers";
 
 const groupID = "group-12";
 const token = "4b3d68f6-93f6-47fe-aa02-88e9440cdc46";
