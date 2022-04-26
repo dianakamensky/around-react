@@ -125,6 +125,87 @@ function Main(props) {
           ></Card>
         ))}
       </section>
+      <PopupWithForm
+        title="Edit Profile"
+        name="editProfile"
+        isOpen={isEditProfilePopupOpen}
+        onClose={closeAllPopups}
+        onSubmit={saveProfile}
+        submitText={profileSubmit}
+      >
+        <input
+          className="popup__input popup__input_info_name"
+          type="text"
+          placeholder="Name"
+          name="name"
+          value={userName}
+          minLength="2"
+          maxLength="40"
+          required
+        />
+        <p className="popup__input-error"></p>
+        <input
+          className="popup__input popup__input_info_job"
+          type="text"
+          placeholder="About me"
+          name="about"
+          value={userDescription}
+          minLength="2"
+          maxLength="200"
+          required
+        />
+        <p className="popup__input-error"></p>
+      </PopupWithForm>
+      <PopupWithForm
+        title="Add Location"
+        name="addLocation"
+        isOpen={isAddPlacePopupOpen}
+        onClose={closeAllPopups}
+        onSubmit={saveLocation}
+        submitText={cardSubmit}
+      >
+        <input
+          className="popup__input popup__input_info_title"
+          type="text"
+          placeholder="Title"
+          name="name"
+          minLength="1"
+          maxLength="30"
+          required
+        />
+        <p className="popup__input-error"></p>
+        <input
+          className="popup__input popup__input_info_link"
+          type="url"
+          placeholder="Image link"
+          name="link"
+          required
+        />
+        <p className="popup__input-error"></p>
+      </PopupWithForm>
+      <PopupWithForm
+        title="Change Profile Picture"
+        name="changeAvatar"
+        isOpen={isEditAvatarPopupOpen}
+        onClose={closeAllPopups}
+        onSubmit={saveAvatar}
+        submitText={avatarSubmit}
+      >
+        <input
+          className="popup__input popup__input_info_link"
+          type="url"
+          placeholder="Image link"
+          name="avatar"
+          required
+        />
+        <p className="popup__input-error"></p>
+      </PopupWithForm>
+      <ImagePopup
+        onClose={closeAllPopups}
+        isOpen={isImagePopupOpen}
+        image={selectedCard.link}
+        caption={selectedCard.name}
+      />
     </main>
   );
 }
