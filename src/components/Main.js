@@ -10,6 +10,7 @@ function Main(props) {
   const [userDescription, setUserDescription] = React.useState("");
   const [cards, setCards] = React.useState([]);
   const [userId, setUserId] = React.useState("");
+  const [isValidUserForm, setIsValidUserForm] = React.useState(false);
 
   React.useEffect(getCards, []);
   React.useEffect(getUserInfo, []);
@@ -51,6 +52,8 @@ function Main(props) {
       })
       .catch((err) => window.alert(`Error fetching user info: ${err}`));
   }
+
+  function userNameHandler() {}
 
   function saveProfile(data) {
     setProfileSubmit("Saving...");
@@ -134,6 +137,7 @@ function Main(props) {
         submitText={profileSubmit}
       >
         <input
+          onChange={userNameHandler}
           className="popup__input popup__input_info_name"
           type="text"
           placeholder="Name"
@@ -145,6 +149,7 @@ function Main(props) {
         />
         <p className="popup__input-error"></p>
         <input
+          onChange={userDescriptionHandler}
           className="popup__input popup__input_info_job"
           type="text"
           placeholder="About me"
@@ -165,6 +170,7 @@ function Main(props) {
         submitText={cardSubmit}
       >
         <input
+          onChange={titleHandler}
           className="popup__input popup__input_info_title"
           type="text"
           placeholder="Title"
@@ -175,6 +181,7 @@ function Main(props) {
         />
         <p className="popup__input-error"></p>
         <input
+          onChange={linkHandler}
           className="popup__input popup__input_info_link"
           type="url"
           placeholder="Image link"
