@@ -19,7 +19,6 @@ function Card(props) {
 
   function openPopup() {
     props.setSelectedCard(card);
-    props.setImagePopupState(true);
   }
 
   return (

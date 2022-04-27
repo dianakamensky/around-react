@@ -5,7 +5,6 @@ import Footer from "./Footer";
 import Logo from "../images/Vector.svg";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
-import FormValidator from "../utils/FormValidator";
 import api from "../utils/api";
 
 function App() {
@@ -15,7 +14,6 @@ function App() {
   const [isAddPlacePopupOpen, setAddPlacePopupState] = React.useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupState] =
     React.useState(false);
-  const [isImagePopupOpen, setImagePopupState] = React.useState(false);
   const [profileSubmit, setProfileSubmit] = React.useState("Save");
   const [cardSubmit, setCardSubmit] = React.useState("Create");
   const [avatarSubmit, setAvatarSubmit] = React.useState("Save");
@@ -40,73 +38,11 @@ function App() {
     setEditAvatarPopupState(true);
   }
 
-  function handleImageClick() {
-    setImagePopupState(true);
-  }
-
   function closeAllPopups() {
     setEditProfilePopupState(false);
     setAddPlacePopupState(false);
     setEditAvatarPopupState(false);
-    setImagePopupState(false);
     setSelectedCard(null);
-  }
-
-  React.useEffect(
-    function () {
-      const formValidator = new FormValidator(
-        validationConfig,
-        document.querySelector('form[name="editProfile"]')
-      );
-      formValidator.enableValidation();
-    },
-    [validationConfig]
-  );
-
-  React.useEffect(
-    function () {
-      const formValidator = new FormValidator(
-        validationConfig,
-        document.querySelector('form[name="addLocation"]')
-      );
-      formValidator.enableValidation();
-    },
-    [validationConfig]
-  );
-
-  React.useEffect(
-    function () {
-      const formValidator = new FormValidator(
-        validationConfig,
-        document.querySelector('form[name="changeAvatar"]')
-      );
-      formValidator.enableValidation();
-    },
-    [validationConfig]
-  );
-
-  function saveLocation(data) {
-    setCardSubmit("Creating...");
-    api
-      .saveLocation(data)
-      .then((data) => {
-        setCards([data, ...cards]);
-        closeAllPopups();
-      })
-      .catch((err) => window.alert(`Error creating card: ${err}`))
-      .finally(() => setCardSubmit("Create"));
-  }
-
-  function saveAvatar(data) {
-    setCardSubmit("Saving...");
-    api
-      .saveAvatar(data)
-      .then((user) => {
-        setUserAvatar(user.avatar);
-        closeAllPopups();
-      })
-      .catch((err) => window.alert(`Error saving avatar: ${err}`))
-      .finally(() => setAvatarSubmit("Save"));
   }
 
   return (
@@ -116,16 +52,16 @@ function App() {
         onEditProfileClick={handleEditProfileClick}
         onAddPlaceClick={handleAddLocationClick}
         onEditAvatarClick={handleEditAvatarClick}
-        onCardClick={handleImageClick}
-        userAvatar={userAvatar}
-        userName={userName}
-        userDescription={userDescription}
-        cards={cards}
-        setCards={setCards}
         setSelectedCard={setSelectedCard}
-        setImagePopupState={setImagePopupState}
       />
       <Footer footerCR="&copy; 2021 Around The U.S" />
+      {selectedCard && (
+        <ImagePopup
+          onClose={closeAllPopups}
+          image={selectedCard.link}
+          caption={selectedCard.name}
+        />
+      )}
     </>
   );
 }

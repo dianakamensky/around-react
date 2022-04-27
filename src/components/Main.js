@@ -22,6 +22,7 @@ function Main(props) {
         cards.forEach(function (card) {
           if (card._id === data._id) {
             card.likes = data.likes;
+            setCards([...cards]);
           }
         });
       })
@@ -55,26 +56,13 @@ function Main(props) {
 
   function userNameHandler() {}
 
-  function saveProfile(data) {
-    setProfileSubmit("Saving...");
-    api
-      .saveProfile(data)
-      .then((user) => {
-        setUserName(user.name);
-        setUserDescription(user.about);
-        closeAllPopups();
-      })
-      .catch((err) => window.alert(`Error saving profile: ${err}`))
-      .finally(() => setProfileSubmit("Save"));
-  }
-
   return (
     <main className="main">
       <section className="profile">
         <div className="profile__avatar-container">
           <img
             className="profile__avatar"
-            src={props.userAvatar}
+            src={userAvatar}
             alt="Profile picture"
           />
           <div
@@ -90,7 +78,7 @@ function Main(props) {
         </div>
         <div className="profile__info">
           <div className="profile__name-container">
-            <h1 className="profile__name">{props.userName}</h1>
+            <h1 className="profile__name">{userName}</h1>
             <button
               type="button"
               className="profile__edit-btn"
@@ -104,7 +92,7 @@ function Main(props) {
               />
             </button>
           </div>
-          <p className="profile__job">{props.userDescription}</p>
+          <p className="profile__job">{userDescription}</p>
         </div>
         <button
           type="button"
@@ -116,7 +104,7 @@ function Main(props) {
         </button>
       </section>
       <section className="locations">
-        {props.cards.map((card) => (
+        {cards.map((card) => (
           <Card
             card={card}
             userId={userId}
@@ -124,95 +112,9 @@ function Main(props) {
             updateLikes={updateLikes}
             deleteCard={deleteCard}
             setSelectedCard={props.setSelectedCard}
-            setImagePopupState={props.setImagePopupState}
           ></Card>
         ))}
       </section>
-      <PopupWithForm
-        title="Edit Profile"
-        name="editProfile"
-        isOpen={isEditProfilePopupOpen}
-        onClose={closeAllPopups}
-        onSubmit={saveProfile}
-        submitText={profileSubmit}
-      >
-        <input
-          onChange={userNameHandler}
-          className="popup__input popup__input_info_name"
-          type="text"
-          placeholder="Name"
-          name="name"
-          value={userName}
-          minLength="2"
-          maxLength="40"
-          required
-        />
-        <p className="popup__input-error"></p>
-        <input
-          onChange={userDescriptionHandler}
-          className="popup__input popup__input_info_job"
-          type="text"
-          placeholder="About me"
-          name="about"
-          value={userDescription}
-          minLength="2"
-          maxLength="200"
-          required
-        />
-        <p className="popup__input-error"></p>
-      </PopupWithForm>
-      <PopupWithForm
-        title="Add Location"
-        name="addLocation"
-        isOpen={isAddPlacePopupOpen}
-        onClose={closeAllPopups}
-        onSubmit={saveLocation}
-        submitText={cardSubmit}
-      >
-        <input
-          onChange={titleHandler}
-          className="popup__input popup__input_info_title"
-          type="text"
-          placeholder="Title"
-          name="name"
-          minLength="1"
-          maxLength="30"
-          required
-        />
-        <p className="popup__input-error"></p>
-        <input
-          onChange={linkHandler}
-          className="popup__input popup__input_info_link"
-          type="url"
-          placeholder="Image link"
-          name="link"
-          required
-        />
-        <p className="popup__input-error"></p>
-      </PopupWithForm>
-      <PopupWithForm
-        title="Change Profile Picture"
-        name="changeAvatar"
-        isOpen={isEditAvatarPopupOpen}
-        onClose={closeAllPopups}
-        onSubmit={saveAvatar}
-        submitText={avatarSubmit}
-      >
-        <input
-          className="popup__input popup__input_info_link"
-          type="url"
-          placeholder="Image link"
-          name="avatar"
-          required
-        />
-        <p className="popup__input-error"></p>
-      </PopupWithForm>
-      <ImagePopup
-        onClose={closeAllPopups}
-        isOpen={isImagePopupOpen}
-        image={selectedCard.link}
-        caption={selectedCard.name}
-      />
     </main>
   );
 }
