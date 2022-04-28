@@ -10,7 +10,6 @@ function Main(props) {
   const [userDescription, setUserDescription] = React.useState("");
   const [cards, setCards] = React.useState([]);
   const [userId, setUserId] = React.useState("");
-  const [isValidUserForm, setIsValidUserForm] = React.useState(false);
 
   React.useEffect(getCards, []);
   React.useEffect(getUserInfo, []);
@@ -53,8 +52,6 @@ function Main(props) {
       })
       .catch((err) => window.alert(`Error fetching user info: ${err}`));
   }
-
-  function userNameHandler() {}
 
   return (
     <main className="main">
