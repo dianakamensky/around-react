@@ -5,14 +5,50 @@ import Footer from "./Footer";
 import Logo from "../images/Vector.svg";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
+import EditProfilePopup from "./EditProfilePopup";
+import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
+import api from "../utils/api";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 function App() {
+  const [currentUser, setCurrentUser] = React.useState({});
   const [selectedCard, setSelectedCard] = React.useState(null);
   const [isEditProfilePopupOpen, setEditProfilePopupState] =
     React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupState] = React.useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupState] =
     React.useState(false);
+  const [cards, setCards] = React.useState([]);
+
+  React.useEffect(initCurrentUser, []);
+
+  React.useEffect(getCards, []);
+
+  function initCurrentUser() {
+    api.getUserInfo().then((user) => setCurrentUser(user));
+  }
+
+  function handleCardLike(card) {
+    const isLiked = card.likes.some((user) => user._id === currentUser._id);
+
+    api
+      .updateCardLike(card._id, isLiked)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((currentCard) =>
+            currentCard._id === card._id ? newCard : currentCard
+          )
+        );
+      })
+      .catch((err) => console.log(`Error liking card: ${err}`));
+  }
+
+  function handleCardDelete(cardId) {
+    api.deleteCard(cardId).then(() => {
+      setCards(cards.filter((c) => c._id !== cardId));
+    });
+  }
 
   function handleEditProfileClick() {
     setEditProfilePopupState(true);
@@ -26,6 +62,27 @@ function App() {
     setEditAvatarPopupState(true);
   }
 
+  function handleUpdateUser(info) {
+    api
+      .saveProfile(info)
+      .then((response) => setCurrentUser(response))
+      .then(closeAllPopups);
+  }
+
+  function handleUpdateAvatar(link) {
+    api
+      .saveAvatar(link)
+      .then((response) => setCurrentUser(response))
+      .then(closeAllPopups);
+  }
+
+  function handleAddPlaceSubmit(info) {
+    api
+      .saveLocation(info)
+      .then((newCard) => setCards([newCard, ...cards]))
+      .then(closeAllPopups);
+  }
+
   function closeAllPopups() {
     setEditProfilePopupState(false);
     setAddPlacePopupState(false);
@@ -33,14 +90,24 @@ function App() {
     setSelectedCard(null);
   }
 
+  function getCards() {
+    api
+      .getInitialCards()
+      .then(setCards)
+      .catch((err) => window.alert(`Error loading initial cards: ${err}`));
+  }
+
   return (
-    <>
+    <CurrentUserContext.Provider value={currentUser}>
       <Header img={Logo} alt="Around the U.S" />
       <Main
         onEditProfileClick={handleEditProfileClick}
         onAddPlaceClick={handleAddLocationClick}
         onEditAvatarClick={handleEditAvatarClick}
         setSelectedCard={setSelectedCard}
+        cards={cards}
+        onCardLike={handleCardLike}
+        onCardDelete={handleCardDelete}
       />
       <Footer footerCR="&copy; 2021 Around The U.S" />
       {selectedCard && (
@@ -50,77 +117,22 @@ function App() {
           caption={selectedCard.name}
         />
       )}
-      <PopupWithForm
-        title="Edit Profile"
-        name="editProfile"
+      <EditProfilePopup
         isOpen={isEditProfilePopupOpen}
         onClose={closeAllPopups}
-        submitText="Save"
-      >
-        <input
-          className="popup__input popup__input_info_name"
-          type="text"
-          placeholder="Name"
-          name="name"
-          minLength="2"
-          maxLength="40"
-          required
-        />
-        <p className="popup__input-error"></p>
-        <input
-          className="popup__input popup__input_info_job"
-          type="text"
-          placeholder="About me"
-          name="about"
-          minLength="2"
-          maxLength="200"
-          required
-        />
-        <p className="popup__input-error"></p>
-      </PopupWithForm>
-      <PopupWithForm
-        title="Add Location"
-        name="addLocation"
+        onUpdateUser={handleUpdateUser}
+      />
+      <AddPlacePopup
         isOpen={isAddPlacePopupOpen}
         onClose={closeAllPopups}
-        submitText="Create"
-      >
-        <input
-          className="popup__input popup__input_info_title"
-          type="text"
-          placeholder="Title"
-          name="name"
-          minLength="1"
-          maxLength="30"
-          required
-        />
-        <p className="popup__input-error"></p>
-        <input
-          className="popup__input popup__input_info_link"
-          type="url"
-          placeholder="Image link"
-          name="link"
-          required
-        />
-        <p className="popup__input-error"></p>
-      </PopupWithForm>
-      <PopupWithForm
-        title="Change Profile Picture"
-        name="changeAvatar"
+        onAddPlace={handleAddPlaceSubmit}
+      ></AddPlacePopup>
+      <EditAvatarPopup
         isOpen={isEditAvatarPopupOpen}
         onClose={closeAllPopups}
-        submitText="Save"
-      >
-        <input
-          className="popup__input popup__input_info_link"
-          type="url"
-          placeholder="Image link"
-          name="avatar"
-          required
-        />
-        <p className="popup__input-error"></p>
-      </PopupWithForm>
-    </>
+        onUpdateAvatar={handleUpdateAvatar}
+      />
+    </CurrentUserContext.Provider>
   );
 }
 

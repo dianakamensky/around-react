@@ -3,55 +3,18 @@ import AddIcon from "../images/addicon.svg";
 import EditIcon from "../images/editicon.svg";
 import Card from "./Card";
 import api from "../utils/api";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
-function Main(props) {
-  const [userName, setUserName] = React.useState("");
-  const [userAvatar, setUserAvatar] = React.useState("");
-  const [userDescription, setUserDescription] = React.useState("");
-  const [cards, setCards] = React.useState([]);
-  const [userId, setUserId] = React.useState("");
-
-  React.useEffect(getCards, []);
-  React.useEffect(getUserInfo, []);
-
-  function updateLikes(cardId, isLiked) {
-    api
-      .updateCardLike(cardId, isLiked)
-      .then((data) => {
-        cards.forEach(function (card) {
-          if (card._id === data._id) {
-            card.likes = data.likes;
-            setCards([...cards]);
-          }
-        });
-      })
-      .catch((err) => console.log(`Error liking card: ${err}`));
-  }
-
-  function getCards() {
-    api
-      .getInitialCards()
-      .then(setCards)
-      .catch((err) => window.alert(`Error loading initial cards: ${err}`));
-  }
-
-  function deleteCard(cardId) {
-    api.deleteCard(cardId).then(() => {
-      props.setCards(props.cards.filter((c) => c._id !== cardId));
-    });
-  }
-
-  function getUserInfo() {
-    api
-      .getUserInfo()
-      .then((user) => {
-        setUserName(user.name);
-        setUserDescription(user.about);
-        setUserAvatar(user.avatar);
-        setUserId(user._id);
-      })
-      .catch((err) => window.alert(`Error fetching user info: ${err}`));
-  }
+function Main({
+  onEditProfileClick,
+  onAddPlaceClick,
+  onEditAvatarClick,
+  setSelectedCard,
+  cards,
+  onCardLike,
+  onCardDelete,
+}) {
+  const currentUser = React.useContext(CurrentUserContext);
 
   return (
     <main className="main">
@@ -59,12 +22,12 @@ function Main(props) {
         <div className="profile__avatar-container">
           <img
             className="profile__avatar"
-            src={userAvatar}
+            src={currentUser.avatar}
             alt="Profile picture"
           />
           <div
             className="profile__edit-avatar-container"
-            onClick={props.onEditAvatarClick}
+            onClick={onEditAvatarClick}
           >
             <img
               className="profile__edit-avatar"
@@ -75,12 +38,12 @@ function Main(props) {
         </div>
         <div className="profile__info">
           <div className="profile__name-container">
-            <h1 className="profile__name">{userName}</h1>
+            <h1 className="profile__name">{currentUser.name}</h1>
             <button
               type="button"
               className="profile__edit-btn"
               aria-label="Edit profile"
-              onClick={props.onEditProfileClick}
+              onClick={onEditProfileClick}
             >
               <img
                 className="profile__edit-icon"
@@ -89,13 +52,13 @@ function Main(props) {
               />
             </button>
           </div>
-          <p className="profile__job">{userDescription}</p>
+          <p className="profile__job">{currentUser.about}</p>
         </div>
         <button
           type="button"
           className="profile__add-btn"
           aria-label="Add location"
-          onClick={props.onAddPlaceClick}
+          onClick={onAddPlaceClick}
         >
           <img className="profile__add-icon" src={AddIcon} alt="Add" />
         </button>
@@ -104,11 +67,10 @@ function Main(props) {
         {cards.map((card) => (
           <Card
             card={card}
-            userId={userId}
             key={card._id}
-            updateLikes={updateLikes}
-            deleteCard={deleteCard}
-            setSelectedCard={props.setSelectedCard}
+            onCardLike={onCardLike}
+            onCardDelete={onCardDelete}
+            setSelectedCard={setSelectedCard}
           ></Card>
         ))}
       </section>

@@ -1,25 +1,27 @@
 import React from "react";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
-function Card(props) {
-  const card = props.card;
+function Card({ card, onCardLike, onCardDelete, setSelectedCard }) {
+  const currentUser = React.useContext(CurrentUserContext);
 
-  function updateLikes() {
-    props.updateLikes(card._id, isLiked());
-  }
-
-  function isLiked() {
-    return card.likes.some((user) => {
-      return user._id === props.userId;
-    });
-  }
+  const isLiked = card.likes.some((user) => user._id === currentUser._id);
 
   function deleteCard() {
-    props.deleteCard(card._id);
+    onCardDelete(card._id);
   }
 
   function openPopup() {
-    props.setSelectedCard(card);
+    setSelectedCard(card);
   }
+
+  function handleLikeClick() {
+    onCardLike(card);
+  }
+
+  // Checking if the current user is the owner of the current card
+  const isOwn = card.owner._id === currentUser._id;
+
+  // Creating a variable which you'll then set in `className` for the delete button
 
   return (
     <article className="card">
@@ -29,7 +31,7 @@ function Card(props) {
         alt={card.name}
         onClick={openPopup}
       />
-      {card.owner._id === props.userId && (
+      {isOwn && (
         <button
           type="button"
           className="card__delete-btn"
@@ -42,9 +44,9 @@ function Card(props) {
           <button
             type="button"
             className={`card__like-btn ${
-              isLiked() ? "card__like-btn_active" : ""
+              isLiked ? "card__like-btn_active" : ""
             }`}
-            onClick={updateLikes}
+            onClick={handleLikeClick}
           ></button>
           <div className="card__likes">{card.likes.length}</div>
         </div>

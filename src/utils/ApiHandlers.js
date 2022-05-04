@@ -42,7 +42,7 @@ export default class Api {
     return this._request("/cards", "POST", data);
   }
 
-  saveAvatar(data) {
-    return this._request("/users/me/avatar", "PATCH", data);
+  saveAvatar(link) {
+    return this._request("/users/me/avatar", "PATCH", { avatar: link });
   }
 }
