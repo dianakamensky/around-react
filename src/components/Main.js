@@ -71,7 +71,7 @@ function Main({
             onCardLike={onCardLike}
             onCardDelete={onCardDelete}
             setSelectedCard={setSelectedCard}
-          ></Card>
+          />
         ))}
       </section>
     </main>

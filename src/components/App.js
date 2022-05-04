@@ -14,7 +14,7 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext";
 function App() {
   const [currentUser, setCurrentUser] = React.useState({});
   const [selectedCard, setSelectedCard] = React.useState(null);
-  const [isEditProfilePopupOpen, setEditProfilePopupState] =
+  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
     React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupState] = React.useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupState] =
@@ -26,7 +26,10 @@ function App() {
   React.useEffect(getCards, []);
 
   function initCurrentUser() {
-    api.getUserInfo().then((user) => setCurrentUser(user));
+    api
+      .getUserInfo()
+      .then((user) => setCurrentUser(user))
+      .catch((error) => console.log(error));
   }
 
   function handleCardLike(card) {
@@ -45,13 +48,16 @@ function App() {
   }
 
   function handleCardDelete(cardId) {
-    api.deleteCard(cardId).then(() => {
-      setCards(cards.filter((c) => c._id !== cardId));
-    });
+    api
+      .deleteCard(cardId)
+      .then(() => {
+        setCards(cards.filter((c) => c._id !== cardId));
+      })
+      .catch((error) => console.log(error));
   }
 
   function handleEditProfileClick() {
-    setEditProfilePopupState(true);
+    setIsEditProfilePopupOpen(true);
   }
 
   function handleAddLocationClick() {
@@ -66,25 +72,28 @@ function App() {
     api
       .saveProfile(info)
       .then((response) => setCurrentUser(response))
-      .then(closeAllPopups);
+      .then(closeAllPopups)
+      .catch((error) => console.log(error));
   }
 
   function handleUpdateAvatar(link) {
     api
       .saveAvatar(link)
       .then((response) => setCurrentUser(response))
-      .then(closeAllPopups);
+      .then(closeAllPopups)
+      .catch((error) => console.log(error));
   }
 
   function handleAddPlaceSubmit(info) {
     api
       .saveLocation(info)
       .then((newCard) => setCards([newCard, ...cards]))
-      .then(closeAllPopups);
+      .then(closeAllPopups)
+      .catch((error) => console.log(error));
   }
 
   function closeAllPopups() {
-    setEditProfilePopupState(false);
+    setIsEditProfilePopupOpen(false);
     setAddPlacePopupState(false);
     setEditAvatarPopupState(false);
     setSelectedCard(null);
@@ -109,14 +118,12 @@ function App() {
         onCardLike={handleCardLike}
         onCardDelete={handleCardDelete}
       />
-      <Footer footerCR="&copy; 2021 Around The U.S" />
-      {selectedCard && (
-        <ImagePopup
-          onClose={closeAllPopups}
-          image={selectedCard.link}
-          caption={selectedCard.name}
-        />
-      )}
+      <Footer footerCR={`© ${new Date().getFullYear()} Around The U.S`} />
+      <ImagePopup
+        onClose={closeAllPopups}
+        image={selectedCard?.link}
+        caption={selectedCard?.name}
+      />
       <EditProfilePopup
         isOpen={isEditProfilePopupOpen}
         onClose={closeAllPopups}
@@ -126,7 +133,7 @@ function App() {
         isOpen={isAddPlacePopupOpen}
         onClose={closeAllPopups}
         onAddPlace={handleAddPlaceSubmit}
-      ></AddPlacePopup>
+      />
       <EditAvatarPopup
         isOpen={isEditAvatarPopupOpen}
         onClose={closeAllPopups}
